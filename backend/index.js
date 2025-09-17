@@ -7,11 +7,11 @@ const jwt = require("jsonwebtoken");
 const cookieParser = require("cookie-parser");
 const axios = require("axios");
 
-const verifyToken = require("../middleware/auth");
-const { HoldingsModel } = require("../model/HoldingsModel");
-const { PositionsModel } = require("../model/PositionsModel");
-const { OrdersModel } = require("../model/OrdersModel");
-const { UserModel } = require("../model/UserModel");
+const verifyToken = require("./middleware/auth");
+const { HoldingsModel } = require("./model/HoldingsModel");
+const { PositionsModel } = require("./model/PositionsModel");
+const { OrdersModel } = require("./model/OrdersModel");
+const { UserModel } = require("./model/UserModel");
 
 const PORT = process.env.PORT || 3003;
 const uri = process.env.MONGO_URL;
