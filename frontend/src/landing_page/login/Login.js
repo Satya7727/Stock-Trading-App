@@ -18,7 +18,6 @@ function Login() {
     const { name, value } = e.target;
     setCredentials({ ...credentials, [name]: value });
 
-    // live validation
     if (name === "email") {
       if (!value) {
         setErrors((prev) => ({ ...prev, email: "Email is required" }));
@@ -46,7 +45,6 @@ function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // check for validation errors before submitting
     if (errors.email || errors.password || !credentials.email || !credentials.password) {
       toast.error("Please fix validation errors");
       return;
@@ -54,7 +52,7 @@ function Login() {
 
     try {
       const res = await axios.post(
-        "http://localhost:3003/login",
+        "/login",
         credentials,
         { withCredentials: true }
       );
@@ -77,7 +75,6 @@ function Login() {
         className="p-4 border rounded shadow-sm bg-light needs-validation"
         noValidate
       >
-        {/* Email */}
         <div className="row mb-3">
           <div className="col">
             <label className="form-label">Email Address</label>
@@ -94,7 +91,6 @@ function Login() {
           </div>
         </div>
 
-        {/* Password */}
         <div className="row mb-4">
           <div className="col">
             <label className="form-label">Password</label>
@@ -111,7 +107,6 @@ function Login() {
           </div>
         </div>
 
-        {/* Submit Button */}
         <button
           type="submit"
           className="btn btn-success w-100"
@@ -120,7 +115,6 @@ function Login() {
           Login
         </button>
 
-        {/* Link */}
         <p className="text-center mt-3 text-muted">
           Don’t have an account? <Link to="/signup">Sign up</Link>
         </p>

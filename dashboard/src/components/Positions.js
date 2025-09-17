@@ -9,7 +9,7 @@ const Positions = () => {
   useEffect(() => {
     const fetchPositions = async () => {
       try {
-        const res = await axios.get("http://localhost:3003/allPositions", {
+        const res = await axios.get("/allPositions", {
           withCredentials: true,
         });
         setAllPositions(res.data);
@@ -54,7 +54,7 @@ const Positions = () => {
               const pnl = curValue - stock.avg * stock.qty;
               const isProfit = pnl >= 0.0;
               
-              const dayChange = 0; // Placeholder
+              const dayChange = 0;
 
               return (
                 <tr key={index}>

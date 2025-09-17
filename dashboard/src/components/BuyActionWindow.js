@@ -3,7 +3,6 @@ import { Link } from "react-router-dom";
 import axios from "axios";
 import toast from "react-hot-toast";
 
-
 import "./BuyActionWindow.css";
 
 const BuyActionWindow = ({ uid, mode = "BUY", onClose }) => {
@@ -15,14 +14,14 @@ const BuyActionWindow = ({ uid, mode = "BUY", onClose }) => {
 
     axios
       .post(
-        "http://localhost:3003/newOrder",
+        "/newOrder",
         {
           name: uid,
           qty: stockQuantity,
           price: stockPrice,
-          mode: mode, 
+          mode: mode,
         },
-        { withCredentials: true } 
+        { withCredentials: true }
       )
       .then((res) => {
         console.log(res.data.message);
@@ -30,7 +29,10 @@ const BuyActionWindow = ({ uid, mode = "BUY", onClose }) => {
         onClose();
       })
       .catch((err) => {
-        console.error("Error saving order:", err.response?.data?.message || err.message);
+        console.error(
+          "Error saving order:",
+          err.response?.data?.message || err.message
+        );
         toast.error("An error occured!");
         onClose();
       });

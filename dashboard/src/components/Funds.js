@@ -11,7 +11,7 @@ const Funds = () => {
   useEffect(() => {
     const fetchBalance = async () => {
       try {
-        const res = await axios.get("http://localhost:3003/getBalance", {
+        const res = await axios.get("/getBalance", {
           withCredentials: true,
         });
         setBalance(res.data.balance);

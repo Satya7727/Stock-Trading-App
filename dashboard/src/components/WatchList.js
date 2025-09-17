@@ -52,19 +52,38 @@ const WatchListActions = ({ uid }) => {
   return (
     <span className="actions">
       <span>
-        <Tooltip title="Buy (B)" placement="top" arrow TransitionComponent={Grow}>
+        <Tooltip
+          title="Buy (B)"
+          placement="top"
+          arrow
+          TransitionComponent={Grow}
+        >
           <button className="buy" style={commonStyle} onClick={handleBuyClick}>
             <span>Buy</span>
           </button>
         </Tooltip>
 
-        <Tooltip title="Sell (S)" placement="top" arrow TransitionComponent={Grow}>
-          <button className="sell" style={commonStyle} onClick={handleSellClick}>
+        <Tooltip
+          title="Sell (S)"
+          placement="top"
+          arrow
+          TransitionComponent={Grow}
+        >
+          <button
+            className="sell"
+            style={commonStyle}
+            onClick={handleSellClick}
+          >
             <span>Sell</span>
           </button>
         </Tooltip>
 
-        <Tooltip title="Analytics (A)" placement="top" arrow TransitionComponent={Grow}>
+        <Tooltip
+          title="Analytics (A)"
+          placement="top"
+          arrow
+          TransitionComponent={Grow}
+        >
           <button className="action" style={commonStyle}>
             <span>
               <BarChartOutlined />
@@ -134,15 +153,16 @@ const WatchList = () => {
   useEffect(() => {
     const fetchWatchlist = async () => {
       try {
-        const res = await axios.get("http://localhost:3003/api/watchlist");
+        const res = await axios.get("/api/watchlist");
         const apiStocks = res.data;
         const mergedStocks = [...apiStocks, ...fallbackStocks];
-        
-        const uniqueStocks = Array.from(new Set(mergedStocks.map(s => s.name)))
-          .map(name => {
-            return mergedStocks.find(s => s.name === name);
-          });
-        
+
+        const uniqueStocks = Array.from(
+          new Set(mergedStocks.map((s) => s.name))
+        ).map((name) => {
+          return mergedStocks.find((s) => s.name === name);
+        });
+
         if (uniqueStocks.length < 8) {
           uniqueStocks.push(...fallbackStocks.slice(uniqueStocks.length));
         }
@@ -201,19 +221,8 @@ const WatchList = () => {
   };
 
   if (loading) {
-    return (
-      <div className="watchlist-container">
-        Loading watchlist...
-      </div>
-    );
+    return <div className="watchlist-container">Loading watchlist...</div>;
   }
-
-  // Only show the error message if there's an error AND no stocks to display.
-  // We'll modify the main render to handle both cases.
-  // The logic below is removed to allow the component to render the list and chart even with the error state.
-  // if (error) {
-  //   return <div className="watchlist-container">Error: {error}</div>;
-  // }
 
   return (
     <div className="watchlist-container">
@@ -231,7 +240,14 @@ const WatchList = () => {
       </div>
 
       {error && (
-        <div style={{ padding: "10px", textAlign: "center", color: "red", fontWeight: "bold" }}>
+        <div
+          style={{
+            padding: "10px",
+            textAlign: "center",
+            color: "red",
+            fontWeight: "bold",
+          }}
+        >
           {error}
         </div>
       )}

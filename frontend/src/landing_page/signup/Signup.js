@@ -26,7 +26,6 @@ function Signup() {
       [name]: value,
     }));
 
-    // Validation
     if (name === "fullName") {
       setErrors((prev) => ({
         ...prev,
@@ -56,7 +55,6 @@ function Signup() {
         setErrors((prev) => ({ ...prev, password: "" }));
       }
 
-      // Also check confirmPassword if it exists
       if (formData.confirmPassword && value !== formData.confirmPassword) {
         setErrors((prev) => ({
           ...prev,
@@ -95,7 +93,7 @@ function Signup() {
 
     try {
       const res = await axios.post(
-        "http://localhost:3003/signup",
+        "/signup",
         {
           fullName: formData.fullName,
           email: formData.email,
@@ -137,7 +135,6 @@ function Signup() {
           {errors.fullName && <div className="invalid-feedback">{errors.fullName}</div>}
         </div>
 
-        {/* Email */}
         <div className="mb-3">
           <label className="form-label">Email Address</label>
           <input
@@ -166,7 +163,6 @@ function Signup() {
           {errors.password && <div className="invalid-feedback">{errors.password}</div>}
         </div>
 
-        {/* Confirm Password */}
         <div className="mb-3">
           <label className="form-label">Confirm Password</label>
           <input

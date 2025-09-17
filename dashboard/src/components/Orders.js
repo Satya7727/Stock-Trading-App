@@ -10,7 +10,7 @@ const Orders = () => {
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const res = await axios.get("http://localhost:3003/allOrders", {
+        const res = await axios.get("/allOrders", {
           withCredentials: true,
         });
         setAllOrders(res.data);

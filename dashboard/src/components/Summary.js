@@ -11,13 +11,19 @@ const Summary = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const userRes = await axios.get("http://localhost:3003/getUserDetails", { withCredentials: true });
+        const userRes = await axios.get("/getUserDetails", {
+          withCredentials: true,
+        });
         setUser({ fullName: userRes.data.fullName });
 
-        const balanceRes = await axios.get("http://localhost:3003/getBalance", { withCredentials: true });
+        const balanceRes = await axios.get("/getBalance", {
+          withCredentials: true,
+        });
         setBalance(balanceRes.data.balance);
 
-        const holdingsRes = await axios.get("http://localhost:3003/allHoldings", { withCredentials: true });
+        const holdingsRes = await axios.get("/allHoldings", {
+          withCredentials: true,
+        });
         setHoldings(holdingsRes.data);
 
         setLoading(false);
@@ -30,10 +36,17 @@ const Summary = () => {
     fetchData();
   }, []);
 
-  const totalInvestment = holdings.reduce((total, stock) => total + stock.qty * stock.avg, 0);
-  const currentValue = holdings.reduce((total, stock) => total + stock.qty * stock.price, 0);
+  const totalInvestment = holdings.reduce(
+    (total, stock) => total + stock.qty * stock.avg,
+    0
+  );
+  const currentValue = holdings.reduce(
+    (total, stock) => total + stock.qty * stock.price,
+    0
+  );
   const totalPNL = currentValue - totalInvestment;
-  const pnlPercentage = (totalInvestment === 0) ? 0 : (totalPNL / totalInvestment) * 100;
+  const pnlPercentage =
+    totalInvestment === 0 ? 0 : (totalPNL / totalInvestment) * 100;
 
   if (loading) {
     return <div>Loading summary...</div>;
@@ -81,7 +94,8 @@ const Summary = () => {
             <h3 style={{ color: totalPNL >= 0 ? "green" : "red" }}>
               ₹{totalPNL.toFixed(2)}{" "}
               <small style={{ color: totalPNL >= 0 ? "green" : "red" }}>
-                {totalPNL >= 0 ? "+" : ""}{pnlPercentage.toFixed(2)}%
+                {totalPNL >= 0 ? "+" : ""}
+                {pnlPercentage.toFixed(2)}%
               </small>
             </h3>
             <p>P&L</p>

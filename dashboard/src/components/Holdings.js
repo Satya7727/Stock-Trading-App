@@ -10,13 +10,16 @@ const Holdings = () => {
   useEffect(() => {
     const fetchHoldings = async () => {
       try {
-        const res = await axios.get("http://localhost:3003/allHoldings", {
+        const res = await axios.get("/allHoldings", {
           withCredentials: true,
         });
         setAllHoldings(res.data);
         setLoading(false);
       } catch (err) {
-        console.error("Error fetching holdings:", err.response?.data?.message || err.message);
+        console.error(
+          "Error fetching holdings:",
+          err.response?.data?.message || err.message
+        );
         setError("Failed to fetch holdings. Please log in again.");
         setLoading(false);
       }
@@ -33,7 +36,8 @@ const Holdings = () => {
     0
   );
   const totalPNL = currentValue - totalInvestment;
-  const pnlPercentage = (totalInvestment === 0) ? 0 : (totalPNL / totalInvestment) * 100;
+  const pnlPercentage =
+    totalInvestment === 0 ? 0 : (totalPNL / totalInvestment) * 100;
 
   const labels = allHoldings.map((stock) => stock.name);
   const data = {
@@ -106,15 +110,11 @@ const Holdings = () => {
 
       <div className="row">
         <div className="col">
-          <h5>
-            ₹{totalInvestment.toFixed(2)}
-          </h5>
+          <h5>₹{totalInvestment.toFixed(2)}</h5>
           <p>Total investment</p>
         </div>
         <div className="col">
-          <h5>
-            ₹{currentValue.toFixed(2)}
-          </h5>
+          <h5>₹{currentValue.toFixed(2)}</h5>
           <p>Current value</p>
         </div>
         <div className="col">
