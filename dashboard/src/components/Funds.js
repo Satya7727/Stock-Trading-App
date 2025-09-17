@@ -3,6 +3,8 @@ import { Link } from "react-router-dom";
 import axios from "axios";
 import "./Funds.css";
 
+const BACKEND_URL = "https://stock-trading-app-scxb.vercel.app";
+
 const Funds = () => {
   const [balance, setBalance] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -11,7 +13,7 @@ const Funds = () => {
   useEffect(() => {
     const fetchBalance = async () => {
       try {
-        const res = await axios.get("/getBalance", {
+        const res = await axios.get(`${BACKEND_URL}/getBalance`, {
           withCredentials: true,
         });
         setBalance(res.data.balance);

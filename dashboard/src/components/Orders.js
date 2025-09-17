@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 
+const BACKEND_URL = "https://stock-trading-app-scxb.vercel.app";
+
 const Orders = () => {
   const [allOrders, setAllOrders] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -10,7 +12,7 @@ const Orders = () => {
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const res = await axios.get("/allOrders", {
+        const res = await axios.get(`${BACKEND_URL}/allOrders`, {
           withCredentials: true,
         });
         setAllOrders(res.data);

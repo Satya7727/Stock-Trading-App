@@ -52,7 +52,7 @@ function Login() {
 
     try {
       const res = await axios.post(
-        "/login",
+        "https://stock-trading-app-scxb.vercel.app/login",
         credentials,
         { withCredentials: true }
       );

@@ -3,6 +3,8 @@ import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import toast from "react-hot-toast";
 
+const BACKEND_URL = "https://stock-trading-app-scxb.vercel.app";
+
 const Menu = () => {
   const [selectedMenu, setSelectedMenu] = useState(0);
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
@@ -13,15 +15,12 @@ const Menu = () => {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const res = await axios.get("/getUserDetails", {
+        const res = await axios.get(`${BACKEND_URL}/getUserDetails`, {
           withCredentials: true,
         });
         const fullName = res.data.fullName;
         const avatar = fullName ? fullName.substring(0, 2).toUpperCase() : "";
-        setUser({
-          fullName,
-          avatar,
-        });
+        setUser({ fullName, avatar });
       } catch (err) {
         console.error("Error fetching user details:", err);
       }
@@ -52,7 +51,7 @@ const Menu = () => {
 
   const handleLogout = async () => {
     try {
-      await axios.post("/logout", {}, { withCredentials: true });
+      await axios.post(`${BACKEND_URL}/logout`, {}, { withCredentials: true });
       toast.success("Logout successful!");
       window.location.href = "https://stock-trading-app-amber.vercel.app";
     } catch (err) {
@@ -71,58 +70,28 @@ const Menu = () => {
       <div className="menus">
         <ul>
           <li>
-            <Link
-              style={{ textDecoration: "none" }}
-              to="/"
-              onClick={() => handleMenuClick(0)}
-            >
-              <p style={selectedMenu === 0 ? activeMenuStyle : menuStyle}>
-                Dashboard
-              </p>
+            <Link style={{ textDecoration: "none" }} to="/" onClick={() => handleMenuClick(0)}>
+              <p style={selectedMenu === 0 ? activeMenuStyle : menuStyle}>Dashboard</p>
             </Link>
           </li>
           <li>
-            <Link
-              style={{ textDecoration: "none" }}
-              to="/orders"
-              onClick={() => handleMenuClick(1)}
-            >
-              <p style={selectedMenu === 1 ? activeMenuStyle : menuStyle}>
-                Orders
-              </p>
+            <Link style={{ textDecoration: "none" }} to="/orders" onClick={() => handleMenuClick(1)}>
+              <p style={selectedMenu === 1 ? activeMenuStyle : menuStyle}>Orders</p>
             </Link>
           </li>
           <li>
-            <Link
-              style={{ textDecoration: "none" }}
-              to="/holdings"
-              onClick={() => handleMenuClick(2)}
-            >
-              <p style={selectedMenu === 2 ? activeMenuStyle : menuStyle}>
-                Holdings
-              </p>
+            <Link style={{ textDecoration: "none" }} to="/holdings" onClick={() => handleMenuClick(2)}>
+              <p style={selectedMenu === 2 ? activeMenuStyle : menuStyle}>Holdings</p>
             </Link>
           </li>
           <li>
-            <Link
-              style={{ textDecoration: "none" }}
-              to="/positions"
-              onClick={() => handleMenuClick(3)}
-            >
-              <p style={selectedMenu === 3 ? activeMenuStyle : menuStyle}>
-                Positions
-              </p>
+            <Link style={{ textDecoration: "none" }} to="/positions" onClick={() => handleMenuClick(3)}>
+              <p style={selectedMenu === 3 ? activeMenuStyle : menuStyle}>Positions</p>
             </Link>
           </li>
           <li>
-            <Link
-              style={{ textDecoration: "none" }}
-              to="funds"
-              onClick={() => handleMenuClick(4)}
-            >
-              <p style={selectedMenu === 4 ? activeMenuStyle : menuStyle}>
-                Funds
-              </p>
+            <Link style={{ textDecoration: "none" }} to="/funds" onClick={() => handleMenuClick(4)}>
+              <p style={selectedMenu === 4 ? activeMenuStyle : menuStyle}>Funds</p>
             </Link>
           </li>
         </ul>
@@ -134,9 +103,7 @@ const Menu = () => {
           </div>
           {isProfileDropdownOpen && (
             <div className="profile-dropdown">
-              <div className="dropdown-item" onClick={handleLogout}>
-                Logout
-              </div>
+              <div className="dropdown-item" onClick={handleLogout}>Logout</div>
             </div>
           )}
         </div>

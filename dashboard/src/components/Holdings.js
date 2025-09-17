@@ -2,6 +2,8 @@ import axios from "axios";
 import { VerticalGraph } from "./VerticalGraph";
 import { useState, useEffect } from "react";
 
+const BACKEND_URL = "https://stock-trading-app-scxb.vercel.app";
+
 const Holdings = () => {
   const [allHoldings, setAllHoldings] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -10,7 +12,7 @@ const Holdings = () => {
   useEffect(() => {
     const fetchHoldings = async () => {
       try {
-        const res = await axios.get("/allHoldings", {
+        const res = await axios.get(`${BACKEND_URL}/allHoldings`, {
           withCredentials: true,
         });
         setAllHoldings(res.data);

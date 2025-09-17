@@ -10,7 +10,8 @@ import {
 } from "@mui/icons-material";
 import { DoughnutChart } from "./DoughnoutChart";
 
-// Define a fallback list of 8 dummy stocks
+const BACKEND_URL = "https://stock-trading-app-scxb.vercel.app";
+
 const fallbackStocks = [
   { name: "INFY", price: 1520.5, percent: 1.25, isDown: false },
   { name: "TCS", price: 3450.7, percent: 0.8, isDown: true },
@@ -26,13 +27,13 @@ const WatchListActions = ({ uid }) => {
   const generalContext = useContext(GeneralContext);
 
   const handleBuyClick = () => {
-    if (generalContext && typeof generalContext.openBuyWindow === "function") {
+    if (generalContext?.openBuyWindow) {
       generalContext.openBuyWindow(uid, "BUY");
     }
   };
 
   const handleSellClick = () => {
-    if (generalContext && typeof generalContext.openBuyWindow === "function") {
+    if (generalContext?.openBuyWindow) {
       generalContext.openBuyWindow(uid, "SELL");
     }
   };
@@ -51,54 +52,26 @@ const WatchListActions = ({ uid }) => {
 
   return (
     <span className="actions">
-      <span>
-        <Tooltip
-          title="Buy (B)"
-          placement="top"
-          arrow
-          TransitionComponent={Grow}
-        >
-          <button className="buy" style={commonStyle} onClick={handleBuyClick}>
-            <span>Buy</span>
-          </button>
-        </Tooltip>
-
-        <Tooltip
-          title="Sell (S)"
-          placement="top"
-          arrow
-          TransitionComponent={Grow}
-        >
-          <button
-            className="sell"
-            style={commonStyle}
-            onClick={handleSellClick}
-          >
-            <span>Sell</span>
-          </button>
-        </Tooltip>
-
-        <Tooltip
-          title="Analytics (A)"
-          placement="top"
-          arrow
-          TransitionComponent={Grow}
-        >
-          <button className="action" style={commonStyle}>
-            <span>
-              <BarChartOutlined />
-            </span>
-          </button>
-        </Tooltip>
-
-        <Tooltip title="More" placement="top" arrow TransitionComponent={Grow}>
-          <button className="action" style={commonStyle}>
-            <span>
-              <MoreHoriz />
-            </span>
-          </button>
-        </Tooltip>
-      </span>
+      <Tooltip title="Buy (B)" placement="top" arrow TransitionComponent={Grow}>
+        <button className="buy" style={commonStyle} onClick={handleBuyClick}>
+          Buy
+        </button>
+      </Tooltip>
+      <Tooltip title="Sell (S)" placement="top" arrow TransitionComponent={Grow}>
+        <button className="sell" style={commonStyle} onClick={handleSellClick}>
+          Sell
+        </button>
+      </Tooltip>
+      <Tooltip title="Analytics (A)" placement="top" arrow TransitionComponent={Grow}>
+        <button className="action" style={commonStyle}>
+          <BarChartOutlined />
+        </button>
+      </Tooltip>
+      <Tooltip title="More" placement="top" arrow TransitionComponent={Grow}>
+        <button className="action" style={commonStyle}>
+          <MoreHoriz />
+        </button>
+      </Tooltip>
     </span>
   );
 };
@@ -106,26 +79,11 @@ const WatchListActions = ({ uid }) => {
 const WatchListItem = ({ stock }) => {
   const [showWatchlistActions, setShowWatchlistActions] = useState(false);
 
-  const handleMouseEnter = () => {
-    setShowWatchlistActions(true);
-  };
-
-  const handleMouseLeave = () => {
-    setShowWatchlistActions(false);
-  };
-
-  if (!stock || typeof stock.price !== "number") {
-    return (
-      <li style={{ color: "red" }}>
-        <div className="item">
-          <p>Error loading stock data</p>
-        </div>
-      </li>
-    );
-  }
-
   return (
-    <li onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
+    <li
+      onMouseEnter={() => setShowWatchlistActions(true)}
+      onMouseLeave={() => setShowWatchlistActions(false)}
+    >
       <div className="item">
         <p style={{ color: stock.isDown ? "red" : "green" }}>{stock.name}</p>
         <div className="itemInfo">
@@ -153,15 +111,15 @@ const WatchList = () => {
   useEffect(() => {
     const fetchWatchlist = async () => {
       try {
-        const res = await axios.get("/api/watchlist");
-        const apiStocks = res.data;
+        const res = await axios.get(`${BACKEND_URL}/api/watchlist`, {
+          withCredentials: true,
+        });
+        const apiStocks = res.data || [];
         const mergedStocks = [...apiStocks, ...fallbackStocks];
 
         const uniqueStocks = Array.from(
           new Set(mergedStocks.map((s) => s.name))
-        ).map((name) => {
-          return mergedStocks.find((s) => s.name === name);
-        });
+        ).map((name) => mergedStocks.find((s) => s.name === name));
 
         if (uniqueStocks.length < 8) {
           uniqueStocks.push(...fallbackStocks.slice(uniqueStocks.length));
@@ -169,27 +127,27 @@ const WatchList = () => {
 
         setAllStocks(uniqueStocks);
         setFilteredStocks(uniqueStocks);
-        setLoading(false);
-        setError(null); // Clear any previous error on success
+        setError(null);
       } catch (err) {
-        console.error("Error fetching watchlist:", err);
-        // Correctly handle the error state and display fallback stocks
-        setError("API not responding. Displaying daily requests.");
+        console.error("Error fetching watchlist:", err.response?.data?.message || err.message);
+        setError("API not responding. Displaying fallback stocks.");
         setAllStocks(fallbackStocks);
         setFilteredStocks(fallbackStocks);
+      } finally {
         setLoading(false);
       }
     };
     fetchWatchlist();
   }, []);
 
-  const handleSearchChange = (event) => {
-    const query = event.target.value;
+  const handleSearchChange = (e) => {
+    const query = e.target.value;
     setSearchQuery(query);
-    const filtered = allStocks.filter((stock) =>
-      stock.name.toLowerCase().includes(query.toLowerCase())
+    setFilteredStocks(
+      allStocks.filter((stock) =>
+        stock.name.toLowerCase().includes(query.toLowerCase())
+      )
     );
-    setFilteredStocks(filtered);
   };
 
   const labels = filteredStocks.map((stock) => stock.name);
@@ -220,34 +178,23 @@ const WatchList = () => {
     ],
   };
 
-  if (loading) {
-    return <div className="watchlist-container">Loading watchlist...</div>;
-  }
+  if (loading) return <div className="watchlist-container">Loading watchlist...</div>;
 
   return (
     <div className="watchlist-container">
       <div className="search-container">
         <input
           type="text"
-          name="search"
-          id="search"
           placeholder="Search eg: BSE, NIFTY, Gold MCX"
           className="search"
           onChange={handleSearchChange}
           value={searchQuery}
         />
-        <span className="counts"> {filteredStocks.length} / 50</span>
+        <span className="counts">{filteredStocks.length} / 50</span>
       </div>
 
       {error && (
-        <div
-          style={{
-            padding: "10px",
-            textAlign: "center",
-            color: "red",
-            fontWeight: "bold",
-          }}
-        >
+        <div style={{ padding: "10px", textAlign: "center", color: "red", fontWeight: "bold" }}>
           {error}
         </div>
       )}

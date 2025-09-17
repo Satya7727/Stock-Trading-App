@@ -1,20 +1,20 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
-import axios from "axios";
 import toast from "react-hot-toast";
+import axios from "axios";
 
 import "./BuyActionWindow.css";
+
+const BACKEND_URL = "https://stock-trading-app-scxb.vercel.app";
 
 const BuyActionWindow = ({ uid, mode = "BUY", onClose }) => {
   const [stockQuantity, setStockQuantity] = useState(1);
   const [stockPrice, setStockPrice] = useState(0.0);
 
-  const handleOrderClick = (e) => {
+  const handleOrderClick = async (e) => {
     e.preventDefault();
-
-    axios
-      .post(
-        "/newOrder",
+    try {
+      const res = await axios.post(
+        `${BACKEND_URL}/newOrder`,
         {
           name: uid,
           qty: stockQuantity,
@@ -22,20 +22,17 @@ const BuyActionWindow = ({ uid, mode = "BUY", onClose }) => {
           mode: mode,
         },
         { withCredentials: true }
-      )
-      .then((res) => {
-        console.log(res.data.message);
-        toast.success("Order placed!");
-        onClose();
-      })
-      .catch((err) => {
-        console.error(
-          "Error saving order:",
-          err.response?.data?.message || err.message
-        );
-        toast.error("An error occured!");
-        onClose();
-      });
+      );
+      toast.success("Order placed!");
+      onClose();
+    } catch (err) {
+      console.error(
+        "Error saving order:",
+        err.response?.data?.message || err.message
+      );
+      toast.error("An error occurred!");
+      onClose();
+    }
   };
 
   const handleCancelClick = (e) => {

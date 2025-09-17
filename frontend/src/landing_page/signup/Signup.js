@@ -93,7 +93,7 @@ function Signup() {
 
     try {
       const res = await axios.post(
-        "/signup",
+        "https://stock-trading-app-scxb.vercel.app/signup", // Updated backend URL
         {
           fullName: formData.fullName,
           email: formData.email,
@@ -125,7 +125,9 @@ function Signup() {
           <label className="form-label">Full Name</label>
           <input
             type="text"
-            className={`form-control ${errors.fullName ? "is-invalid" : formData.fullName ? "is-valid" : ""}`}
+            className={`form-control ${
+              errors.fullName ? "is-invalid" : formData.fullName ? "is-valid" : ""
+            }`}
             name="fullName"
             value={formData.fullName}
             onChange={handleChange}
@@ -139,7 +141,9 @@ function Signup() {
           <label className="form-label">Email Address</label>
           <input
             type="email"
-            className={`form-control ${errors.email ? "is-invalid" : formData.email ? "is-valid" : ""}`}
+            className={`form-control ${
+              errors.email ? "is-invalid" : formData.email ? "is-valid" : ""
+            }`}
             name="email"
             value={formData.email}
             onChange={handleChange}
@@ -153,7 +157,9 @@ function Signup() {
           <label className="form-label">Password</label>
           <input
             type="password"
-            className={`form-control ${errors.password ? "is-invalid" : formData.password ? "is-valid" : ""}`}
+            className={`form-control ${
+              errors.password ? "is-invalid" : formData.password ? "is-valid" : ""
+            }`}
             name="password"
             value={formData.password}
             onChange={handleChange}
@@ -167,14 +173,18 @@ function Signup() {
           <label className="form-label">Confirm Password</label>
           <input
             type="password"
-            className={`form-control ${errors.confirmPassword ? "is-invalid" : formData.confirmPassword ? "is-valid" : ""}`}
+            className={`form-control ${
+              errors.confirmPassword ? "is-invalid" : formData.confirmPassword ? "is-valid" : ""
+            }`}
             name="confirmPassword"
             value={formData.confirmPassword}
             onChange={handleChange}
             placeholder="Re-enter your password"
             required
           />
-          {errors.confirmPassword && <div className="invalid-feedback">{errors.confirmPassword}</div>}
+          {errors.confirmPassword && (
+            <div className="invalid-feedback">{errors.confirmPassword}</div>
+          )}
         </div>
 
         <button

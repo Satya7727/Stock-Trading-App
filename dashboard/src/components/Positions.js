@@ -1,6 +1,8 @@
 import axios from "axios";
 import { useState, useEffect } from "react";
 
+const BACKEND_URL = "https://stock-trading-app-scxb.vercel.app";
+
 const Positions = () => {
   const [allPositions, setAllPositions] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -9,14 +11,14 @@ const Positions = () => {
   useEffect(() => {
     const fetchPositions = async () => {
       try {
-        const res = await axios.get("/allPositions", {
+        const res = await axios.get(`${BACKEND_URL}/allPositions`, {
           withCredentials: true,
         });
         setAllPositions(res.data);
-        setLoading(false);
       } catch (err) {
         console.error("Error fetching positions:", err.response?.data?.message || err.message);
         setError("Failed to fetch positions. Please log in again.");
+      } finally {
         setLoading(false);
       }
     };
@@ -53,7 +55,6 @@ const Positions = () => {
               const curValue = stock.price * stock.qty;
               const pnl = curValue - stock.avg * stock.qty;
               const isProfit = pnl >= 0.0;
-              
               const dayChange = 0;
 
               return (
@@ -66,7 +67,7 @@ const Positions = () => {
                   <td style={{ color: isProfit ? "green" : "red" }}>
                     {pnl.toFixed(2)}
                   </td>
-                  <td style={{ color: stock.isLoss ? "red" : "green" }}>
+                  <td style={{ color: dayChange >= 0 ? "green" : "red" }}>
                     {dayChange.toFixed(2)}
                   </td>
                 </tr>

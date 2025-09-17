@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 
+const BACKEND_URL = "https://stock-trading-app-scxb.vercel.app";
+
 const Summary = () => {
   const [user, setUser] = useState({ fullName: "User" });
   const [balance, setBalance] = useState(0);
@@ -11,24 +13,24 @@ const Summary = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const userRes = await axios.get("/getUserDetails", {
+        const userRes = await axios.get(`${BACKEND_URL}/getUserDetails`, {
           withCredentials: true,
         });
         setUser({ fullName: userRes.data.fullName });
 
-        const balanceRes = await axios.get("/getBalance", {
+        const balanceRes = await axios.get(`${BACKEND_URL}/getBalance`, {
           withCredentials: true,
         });
         setBalance(balanceRes.data.balance);
 
-        const holdingsRes = await axios.get("/allHoldings", {
+        const holdingsRes = await axios.get(`${BACKEND_URL}/allHoldings`, {
           withCredentials: true,
         });
         setHoldings(holdingsRes.data);
 
         setLoading(false);
       } catch (err) {
-        console.error("Error fetching summary data:", err);
+        console.error("Error fetching summary data:", err.response?.data?.message || err.message);
         setError("Failed to load summary data. Please try again.");
         setLoading(false);
       }
@@ -70,7 +72,7 @@ const Summary = () => {
         <div className="data">
           <div className="first">
             <h3>₹{balance.toFixed(2)}</h3>
-            <p>Margin available-Just for Demo now</p>
+            <p>Margin available - Just for Demo now</p>
           </div>
           <hr />
           <div className="second">
