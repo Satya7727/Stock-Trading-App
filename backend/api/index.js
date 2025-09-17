@@ -6,7 +6,6 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const cookieParser = require("cookie-parser");
 const axios = require("axios");
-const serverless = require("serverless-http");
 
 const verifyToken = require("../middleware/auth");
 const { HoldingsModel } = require("../model/HoldingsModel");
@@ -14,35 +13,21 @@ const { PositionsModel } = require("../model/PositionsModel");
 const { OrdersModel } = require("../model/OrdersModel");
 const { UserModel } = require("../model/UserModel");
 
+const PORT = process.env.PORT || 3003;
 const uri = process.env.MONGO_URL;
 const JWT_SECRET = process.env.JWT_SECRET || "yourSecretKey";
 const EODHD_API_KEY = process.env.EODHD_API_KEY;
 
 const app = express();
-
 app.use(
   cors({
-    origin: [
-      "https://stock-trading-app-amber.vercel.app",
-      "https://stock-trading-app-zeuq.vercel.app",
-    ],
+    origin: ["https://stock-trading-app-amber.vercel.app", "https://stock-trading-app-zeuq.vercel.app"],
     credentials: true,
   })
 );
 
 app.use(express.json());
 app.use(cookieParser());
-
-mongoose
-  .connect(uri)
-  .then(() => {
-    console.log("DB connected!");
-  })
-  .catch((err) => {
-    console.error("Database connection error:", err.message);
-  });
-
-// ------------------ ROUTES ------------------ //
 
 app.get("/allHoldings", verifyToken, async (req, res) => {
   try {
@@ -144,8 +129,8 @@ app.post("/signup", async (req, res) => {
     const newUser = new UserModel({ fullName, email, password: hashedPassword });
     await newUser.save();
     const token = jwt.sign({ userId: newUser._id, fullName: newUser.fullName }, JWT_SECRET, { expiresIn: "1h" });
-    res.cookie("token", token, { httpOnly: true, secure: true, sameSite: "None", maxAge: 60 * 60 * 1000 * 24 * 3 });
-    res.status(201).json({ message: "User created successfully", redirectUrl: "https://stock-trading-app-zeuq.vercel.app/" });
+    res.cookie("token", token, { httpOnly: true, secure: false, maxAge: 60 * 60 * 1000 * 24 * 3 });
+    res.status(201).json({ message: "User created successfully", redirectUrl: "https://stock-trading-app-amber.vercel.app/" });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Server error" });
@@ -164,8 +149,8 @@ app.post("/login", async (req, res) => {
       return res.status(400).json({ message: "Invalid email or password" });
     }
     const token = jwt.sign({ userId: user._id, fullName: user.fullName }, JWT_SECRET, { expiresIn: "1h" });
-    res.cookie("token", token, { httpOnly: true, secure: true, sameSite: "None", maxAge: 60 * 60 * 1000 * 24 * 3 });
-    res.status(200).json({ message: "Login successful", redirectUrl: "https://stock-trading-app-zeuq.vercel.app/" });
+    res.cookie("token", token, { httpOnly: true, secure: false, maxAge: 60 * 60 * 1000 * 24 * 3 });
+    res.status(200).json({ message: "Login successful", redirectUrl: "https://stock-trading-app-amber.vercel.app/" });
   } catch (err) {
     console.error("Login error:", err);
     res.status(500).json({ message: "Server error" });
@@ -174,7 +159,7 @@ app.post("/login", async (req, res) => {
 
 app.post("/logout", (req, res) => {
   try {
-    res.clearCookie("token", { httpOnly: true, secure: true, sameSite: "None" });
+    res.clearCookie("token", { httpOnly: true, secure: false });
     return res.status(200).json({ message: "Logout successful" });
   } catch (err) {
     console.error("Logout error:", err);
@@ -224,4 +209,14 @@ app.get("/api/watchlist", async (req, res) => {
   }
 });
 
-module.exports = serverless(app);
+mongoose
+  .connect(uri)
+  .then(() => {
+    console.log("DB connected!");
+    app.listen(PORT, () => {
+      console.log(`App is started on port ${PORT}`);
+    });
+  })
+  .catch((err) => {
+    console.error("Database connection error:", err.message);
+  });
