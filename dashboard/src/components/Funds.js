@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import axios from "axios";
 import "./Funds.css";
 
-const BACKEND_URL = "https://stock-trading-app-scxb.vercel.app";
+const BACKEND_URL = "https://stock-trading-app-ton3.onrender.com";
 
 const Funds = () => {
   const [balance, setBalance] = useState(0);

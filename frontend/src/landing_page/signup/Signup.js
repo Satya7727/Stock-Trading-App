@@ -93,7 +93,7 @@ function Signup() {
 
     try {
       const res = await axios.post(
-        "https://stock-trading-app-scxb.vercel.app/signup", // Updated backend URL
+        "https://stock-trading-app-ton3.onrender.com/signup",
         {
           fullName: formData.fullName,
           email: formData.email,

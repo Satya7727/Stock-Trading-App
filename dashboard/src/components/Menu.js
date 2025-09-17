@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import toast from "react-hot-toast";
 
-const BACKEND_URL = "https://stock-trading-app-scxb.vercel.app";
+const BACKEND_URL = "https://stock-trading-app-ton3.onrender.com";
 
 const Menu = () => {
   const [selectedMenu, setSelectedMenu] = useState(0);

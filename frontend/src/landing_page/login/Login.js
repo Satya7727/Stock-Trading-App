@@ -52,7 +52,7 @@ function Login() {
 
     try {
       const res = await axios.post(
-        "https://stock-trading-app-scxb.vercel.app/login",
+        "https://stock-trading-app-ton3.onrender.com/login",
         credentials,
         { withCredentials: true }
       );

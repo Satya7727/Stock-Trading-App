@@ -1,7 +1,7 @@
 import axios from "axios";
 import { useState, useEffect } from "react";
 
-const BACKEND_URL = "https://stock-trading-app-scxb.vercel.app";
+const BACKEND_URL = "https://stock-trading-app-ton3.onrender.com";
 
 const Positions = () => {
   const [allPositions, setAllPositions] = useState([]);
@@ -36,7 +36,6 @@ const Positions = () => {
   return (
     <>
       <h3>Positions ({allPositions.length})</h3>
-
       <div className="order-table">
         <table>
           <thead>

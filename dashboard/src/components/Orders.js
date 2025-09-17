@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 
-const BACKEND_URL = "https://stock-trading-app-scxb.vercel.app";
+const BACKEND_URL = "https://stock-trading-app-ton3.onrender.com";
 
 const Orders = () => {
   const [allOrders, setAllOrders] = useState([]);
@@ -37,7 +37,6 @@ const Orders = () => {
   return (
     <div className="orders-container">
       <h3>Orders ({allOrders.length})</h3>
-
       {allOrders.length === 0 ? (
         <div className="no-orders">
           <p>You haven't placed any orders today</p>

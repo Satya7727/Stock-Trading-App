@@ -4,7 +4,7 @@ import axios from "axios";
 
 import "./BuyActionWindow.css";
 
-const BACKEND_URL = "https://stock-trading-app-scxb.vercel.app";
+const BACKEND_URL = "https://stock-trading-app-ton3.onrender.com";
 
 const BuyActionWindow = ({ uid, mode = "BUY", onClose }) => {
   const [stockQuantity, setStockQuantity] = useState(1);

@@ -2,7 +2,7 @@ import axios from "axios";
 import { VerticalGraph } from "./VerticalGraph";
 import { useState, useEffect } from "react";
 
-const BACKEND_URL = "https://stock-trading-app-scxb.vercel.app";
+const BACKEND_URL = "https://stock-trading-app-ton3.onrender.com";
 
 const Holdings = () => {
   const [allHoldings, setAllHoldings] = useState([]);
@@ -64,7 +64,6 @@ const Holdings = () => {
   return (
     <>
       <h3>Holdings ({allHoldings.length})</h3>
-
       <div className="order-table">
         <table>
           <thead>
@@ -109,7 +108,6 @@ const Holdings = () => {
           </tbody>
         </table>
       </div>
-
       <div className="row">
         <div className="col">
           <h5>₹{totalInvestment.toFixed(2)}</h5>

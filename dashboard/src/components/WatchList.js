@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext, useMemo } from "react";
 import axios from "axios";
 import GeneralContext from "./GeneralContext";
 import { Tooltip, Grow } from "@mui/material";
@@ -23,18 +23,13 @@ const fallbackStocks = [
   { name: "LT", price: 1850.4, percent: 1.5, isDown: false },
 ];
 
+/* ---------------- Watchlist Actions ---------------- */
 const WatchListActions = ({ uid }) => {
   const generalContext = useContext(GeneralContext);
 
-  const handleBuyClick = () => {
+  const handleAction = (type) => {
     if (generalContext?.openBuyWindow) {
-      generalContext.openBuyWindow(uid, "BUY");
-    }
-  };
-
-  const handleSellClick = () => {
-    if (generalContext?.openBuyWindow) {
-      generalContext.openBuyWindow(uid, "SELL");
+      generalContext.openBuyWindow(uid, type);
     }
   };
 
@@ -53,12 +48,12 @@ const WatchListActions = ({ uid }) => {
   return (
     <span className="actions">
       <Tooltip title="Buy (B)" placement="top" arrow TransitionComponent={Grow}>
-        <button className="buy" style={commonStyle} onClick={handleBuyClick}>
+        <button className="buy" style={commonStyle} onClick={() => handleAction("BUY")}>
           Buy
         </button>
       </Tooltip>
       <Tooltip title="Sell (S)" placement="top" arrow TransitionComponent={Grow}>
-        <button className="sell" style={commonStyle} onClick={handleSellClick}>
+        <button className="sell" style={commonStyle} onClick={() => handleAction("SELL")}>
           Sell
         </button>
       </Tooltip>
@@ -76,13 +71,14 @@ const WatchListActions = ({ uid }) => {
   );
 };
 
+/* ---------------- Single Stock Item ---------------- */
 const WatchListItem = ({ stock }) => {
-  const [showWatchlistActions, setShowWatchlistActions] = useState(false);
+  const [showActions, setShowActions] = useState(false);
 
   return (
     <li
-      onMouseEnter={() => setShowWatchlistActions(true)}
-      onMouseLeave={() => setShowWatchlistActions(false)}
+      onMouseEnter={() => setShowActions(true)}
+      onMouseLeave={() => setShowActions(false)}
     >
       <div className="item">
         <p style={{ color: stock.isDown ? "red" : "green" }}>{stock.name}</p>
@@ -96,14 +92,14 @@ const WatchListItem = ({ stock }) => {
           <span className="price">₹{stock.price.toFixed(2)}</span>
         </div>
       </div>
-      {showWatchlistActions && <WatchListActions uid={stock.name} />}
+      {showActions && <WatchListActions uid={stock.name} />}
     </li>
   );
 };
 
+/* ---------------- Main Watchlist ---------------- */
 const WatchList = () => {
   const [allStocks, setAllStocks] = useState([]);
-  const [filteredStocks, setFilteredStocks] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -114,98 +110,111 @@ const WatchList = () => {
         const res = await axios.get(`${BACKEND_URL}/api/watchlist`, {
           withCredentials: true,
         });
-        const apiStocks = res.data || [];
+        const apiStocks = Array.isArray(res.data) ? res.data : [];
+
         const mergedStocks = [...apiStocks, ...fallbackStocks];
 
+        // Ensure unique by name
         const uniqueStocks = Array.from(
           new Set(mergedStocks.map((s) => s.name))
         ).map((name) => mergedStocks.find((s) => s.name === name));
 
-        if (uniqueStocks.length < 8) {
-          uniqueStocks.push(...fallbackStocks.slice(uniqueStocks.length));
+        // Ensure minimum 8 stocks
+        while (uniqueStocks.length < 8) {
+          uniqueStocks.push(
+            fallbackStocks[uniqueStocks.length % fallbackStocks.length]
+          );
         }
 
         setAllStocks(uniqueStocks);
-        setFilteredStocks(uniqueStocks);
         setError(null);
       } catch (err) {
         console.error("Error fetching watchlist:", err.response?.data?.message || err.message);
-        setError("API not responding. Displaying fallback stocks.");
+        setError("⚠️ API not responding. Showing demo stocks.");
         setAllStocks(fallbackStocks);
-        setFilteredStocks(fallbackStocks);
       } finally {
         setLoading(false);
       }
     };
+
     fetchWatchlist();
   }, []);
 
-  const handleSearchChange = (e) => {
-    const query = e.target.value;
-    setSearchQuery(query);
-    setFilteredStocks(
-      allStocks.filter((stock) =>
-        stock.name.toLowerCase().includes(query.toLowerCase())
-      )
+  const filteredStocks = useMemo(() => {
+    return allStocks.filter((stock) =>
+      stock.name.toLowerCase().includes(searchQuery.toLowerCase())
     );
-  };
+  }, [searchQuery, allStocks]);
 
-  const labels = filteredStocks.map((stock) => stock.name);
-  const data = {
-    labels,
-    datasets: [
-      {
-        label: "Price",
-        data: filteredStocks.map((stock) => stock.price),
-        backgroundColor: [
-          "rgba(255, 99, 132, 0.5)",
-          "rgba(54, 162, 235, 0.5)",
-          "rgba(255, 206, 86, 0.5)",
-          "rgba(75, 192, 192, 0.5)",
-          "rgba(153, 102, 255, 0.5)",
-          "rgba(255, 159, 64, 0.5)",
-        ],
-        borderColor: [
-          "rgba(255, 99, 132, 1)",
-          "rgba(54, 162, 235, 1)",
-          "rgba(255, 206, 86, 1)",
-          "rgba(75, 192, 192, 1)",
-          "rgba(153, 102, 255, 1)",
-          "rgba(255, 159, 64, 1)",
-        ],
-        borderWidth: 1,
-      },
-    ],
-  };
+  const chartData = useMemo(() => {
+    return {
+      labels: filteredStocks.map((stock) => stock.name),
+      datasets: [
+        {
+          label: "Price",
+          data: filteredStocks.map((stock) => stock.price),
+          backgroundColor: [
+            "rgba(255, 99, 132, 0.5)",
+            "rgba(54, 162, 235, 0.5)",
+            "rgba(255, 206, 86, 0.5)",
+            "rgba(75, 192, 192, 0.5)",
+            "rgba(153, 102, 255, 0.5)",
+            "rgba(255, 159, 64, 0.5)",
+          ],
+          borderColor: [
+            "rgba(255, 99, 132, 1)",
+            "rgba(54, 162, 235, 1)",
+            "rgba(255, 206, 86, 1)",
+            "rgba(75, 192, 192, 1)",
+            "rgba(153, 102, 255, 1)",
+            "rgba(255, 159, 64, 1)",
+          ],
+          borderWidth: 1,
+        },
+      ],
+    };
+  }, [filteredStocks]);
 
-  if (loading) return <div className="watchlist-container">Loading watchlist...</div>;
+  if (loading) {
+    return <div className="watchlist-container">Loading watchlist...</div>;
+  }
 
   return (
     <div className="watchlist-container">
+      {/* Search */}
       <div className="search-container">
         <input
           type="text"
           placeholder="Search eg: BSE, NIFTY, Gold MCX"
           className="search"
-          onChange={handleSearchChange}
+          onChange={(e) => setSearchQuery(e.target.value)}
           value={searchQuery}
         />
         <span className="counts">{filteredStocks.length} / 50</span>
       </div>
 
+      {/* Error Message */}
       {error && (
         <div style={{ padding: "10px", textAlign: "center", color: "red", fontWeight: "bold" }}>
           {error}
         </div>
       )}
 
+      {/* Stock List */}
       <ul className="list">
-        {filteredStocks.map((stock, index) => (
-          <WatchListItem stock={stock} key={index} />
-        ))}
+        {filteredStocks.length > 0 ? (
+          filteredStocks.map((stock, index) => (
+            <WatchListItem stock={stock} key={index} />
+          ))
+        ) : (
+          <li style={{ textAlign: "center", color: "gray", padding: "10px" }}>
+            No stocks match your search.
+          </li>
+        )}
       </ul>
 
-      <DoughnutChart data={data} />
+      {/* Doughnut Chart */}
+      <DoughnutChart data={chartData} />
     </div>
   );
 };

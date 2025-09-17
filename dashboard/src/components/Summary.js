@@ -13,31 +13,30 @@ const Summary = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const userRes = await axios.get(`${BACKEND_URL}/getUserDetails`, {
-          withCredentials: true,
-        });
-        setUser({ fullName: userRes.data.fullName });
+        const [userRes, balanceRes, holdingsRes] = await Promise.all([
+          axios.get(`${BACKEND_URL}/getUserDetails`, { withCredentials: true }),
+          axios.get(`${BACKEND_URL}/getBalance`, { withCredentials: true }),
+          axios.get(`${BACKEND_URL}/allHoldings`, { withCredentials: true }),
+        ]);
 
-        const balanceRes = await axios.get(`${BACKEND_URL}/getBalance`, {
-          withCredentials: true,
-        });
-        setBalance(balanceRes.data.balance);
-
-        const holdingsRes = await axios.get(`${BACKEND_URL}/allHoldings`, {
-          withCredentials: true,
-        });
-        setHoldings(holdingsRes.data);
-
-        setLoading(false);
+        setUser({ fullName: userRes.data.fullName || "User" });
+        setBalance(balanceRes.data.balance || 0);
+        setHoldings(Array.isArray(holdingsRes.data) ? holdingsRes.data : []);
       } catch (err) {
-        console.error("Error fetching summary data:", err.response?.data?.message || err.message);
-        setError("Failed to load summary data. Please try again.");
+        console.error(
+          "Error fetching summary data:",
+          err.response?.data?.message || err.message
+        );
+        setError("Failed to load summary data. Please log in again.");
+      } finally {
         setLoading(false);
       }
     };
+
     fetchData();
   }, []);
 
+  // Calculations
   const totalInvestment = holdings.reduce(
     (total, stock) => total + stock.qty * stock.avg,
     0
@@ -55,16 +54,18 @@ const Summary = () => {
   }
 
   if (error) {
-    return <div>{error}</div>;
+    return <div style={{ color: "red" }}>{error}</div>;
   }
 
   return (
     <>
+      {/* User Greeting */}
       <div className="username">
         <h6>Hi, {user.fullName}!</h6>
         <hr className="divider" />
       </div>
 
+      {/* Balance Section */}
       <div className="section">
         <span>
           <p>Equity</p>
@@ -72,7 +73,7 @@ const Summary = () => {
         <div className="data">
           <div className="first">
             <h3>₹{balance.toFixed(2)}</h3>
-            <p>Margin available - Just for Demo now</p>
+            <p>Margin available (Demo)</p>
           </div>
           <hr />
           <div className="second">
@@ -87,30 +88,37 @@ const Summary = () => {
         <hr className="divider" />
       </div>
 
+      {/* Holdings Section */}
       <div className="section">
         <span>
           <p>Holdings ({holdings.length})</p>
         </span>
         <div className="data">
-          <div className="first">
-            <h3 style={{ color: totalPNL >= 0 ? "green" : "red" }}>
-              ₹{totalPNL.toFixed(2)}{" "}
-              <small style={{ color: totalPNL >= 0 ? "green" : "red" }}>
-                {totalPNL >= 0 ? "+" : ""}
-                {pnlPercentage.toFixed(2)}%
-              </small>
-            </h3>
-            <p>P&L</p>
-          </div>
-          <hr />
-          <div className="second">
-            <p>
-              Current Value <span>₹{currentValue.toFixed(2)}</span>
-            </p>
-            <p>
-              Investment <span>₹{totalInvestment.toFixed(2)}</span>
-            </p>
-          </div>
+          {holdings.length > 0 ? (
+            <>
+              <div className="first">
+                <h3 style={{ color: totalPNL >= 0 ? "green" : "red" }}>
+                  ₹{totalPNL.toFixed(2)}{" "}
+                  <small style={{ color: totalPNL >= 0 ? "green" : "red" }}>
+                    {totalPNL >= 0 ? "+" : ""}
+                    {pnlPercentage.toFixed(2)}%
+                  </small>
+                </h3>
+                <p>P&L</p>
+              </div>
+              <hr />
+              <div className="second">
+                <p>
+                  Current Value <span>₹{currentValue.toFixed(2)}</span>
+                </p>
+                <p>
+                  Investment <span>₹{totalInvestment.toFixed(2)}</span>
+                </p>
+              </div>
+            </>
+          ) : (
+            <p>No holdings yet. Start trading to see your summary here.</p>
+          )}
         </div>
         <hr className="divider" />
       </div>
