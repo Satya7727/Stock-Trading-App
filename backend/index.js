@@ -118,6 +118,8 @@ app.get("/getBalance", verifyToken, async (req, res) => {
   }
 });
 
+
+
 app.post("/signup", async (req, res) => {
   try {
     const { fullName, email, password } = req.body;
@@ -130,7 +132,10 @@ app.post("/signup", async (req, res) => {
     await newUser.save();
     const token = jwt.sign({ userId: newUser._id, fullName: newUser.fullName }, JWT_SECRET, { expiresIn: "1h" });
     res.cookie("token", token, { httpOnly: true, secure: false, maxAge: 60 * 60 * 1000 * 24 * 3 });
-    res.status(201).json({ message: "User created successfully", redirectUrl: "https://stock-trading-app-amber.vercel.app/" });
+    res.status(201).json({ 
+      message: "User created successfully", 
+      redirectUrl: "https://stock-trading-app-zeuq.vercel.app/"   // ✅ updated
+    });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Server error" });
@@ -150,12 +155,16 @@ app.post("/login", async (req, res) => {
     }
     const token = jwt.sign({ userId: user._id, fullName: user.fullName }, JWT_SECRET, { expiresIn: "1h" });
     res.cookie("token", token, { httpOnly: true, secure: false, maxAge: 60 * 60 * 1000 * 24 * 3 });
-    res.status(200).json({ message: "Login successful", redirectUrl: "https://stock-trading-app-amber.vercel.app/" });
+    res.status(200).json({ 
+      message: "Login successful", 
+      redirectUrl: "https://stock-trading-app-zeuq.vercel.app/"   // ✅ updated
+    });
   } catch (err) {
     console.error("Login error:", err);
     res.status(500).json({ message: "Server error" });
   }
 });
+
 
 app.post("/logout", (req, res) => {
   try {
