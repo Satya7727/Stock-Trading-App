@@ -10,7 +10,7 @@ import {
 } from "@mui/icons-material";
 import { DoughnutChart } from "./DoughnoutChart";
 
-const BACKEND_URL = "https://stock-trading-app-scxb.vercel.app";
+const BACKEND_URL = "https://stock-trading-app-ton3.onrender.com";
 
 const fallbackStocks = [
   { name: "INFY", price: 1520.5, percent: 1.25, isDown: false },
@@ -23,16 +23,13 @@ const fallbackStocks = [
   { name: "LT", price: 1850.4, percent: 1.5, isDown: false },
 ];
 
-/* ---------------- Watchlist Actions ---------------- */
 const WatchListActions = ({ uid }) => {
   const generalContext = useContext(GeneralContext);
-
   const handleAction = (type) => {
     if (generalContext?.openBuyWindow) {
       generalContext.openBuyWindow(uid, type);
     }
   };
-
   const commonStyle = {
     display: "inline-flex",
     alignItems: "center",
@@ -44,7 +41,6 @@ const WatchListActions = ({ uid }) => {
     cursor: "pointer",
     verticalAlign: "middle",
   };
-
   return (
     <span className="actions">
       <Tooltip title="Buy (B)" placement="top" arrow TransitionComponent={Grow}>
@@ -71,10 +67,8 @@ const WatchListActions = ({ uid }) => {
   );
 };
 
-/* ---------------- Single Stock Item ---------------- */
 const WatchListItem = ({ stock }) => {
   const [showActions, setShowActions] = useState(false);
-
   return (
     <li
       onMouseEnter={() => setShowActions(true)}
@@ -97,13 +91,11 @@ const WatchListItem = ({ stock }) => {
   );
 };
 
-/* ---------------- Main Watchlist ---------------- */
 const WatchList = () => {
   const [allStocks, setAllStocks] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
   useEffect(() => {
     const fetchWatchlist = async () => {
       try {
@@ -111,21 +103,15 @@ const WatchList = () => {
           withCredentials: true,
         });
         const apiStocks = Array.isArray(res.data) ? res.data : [];
-
         const mergedStocks = [...apiStocks, ...fallbackStocks];
-
-        // Ensure unique by name
         const uniqueStocks = Array.from(
           new Set(mergedStocks.map((s) => s.name))
         ).map((name) => mergedStocks.find((s) => s.name === name));
-
-        // Ensure minimum 8 stocks
         while (uniqueStocks.length < 8) {
           uniqueStocks.push(
             fallbackStocks[uniqueStocks.length % fallbackStocks.length]
           );
         }
-
         setAllStocks(uniqueStocks);
         setError(null);
       } catch (err) {
@@ -136,7 +122,6 @@ const WatchList = () => {
         setLoading(false);
       }
     };
-
     fetchWatchlist();
   }, []);
 
@@ -178,10 +163,9 @@ const WatchList = () => {
   if (loading) {
     return <div className="watchlist-container">Loading watchlist...</div>;
   }
-
+  
   return (
     <div className="watchlist-container">
-      {/* Search */}
       <div className="search-container">
         <input
           type="text"
@@ -192,15 +176,11 @@ const WatchList = () => {
         />
         <span className="counts">{filteredStocks.length} / 50</span>
       </div>
-
-      {/* Error Message */}
       {error && (
         <div style={{ padding: "10px", textAlign: "center", color: "red", fontWeight: "bold" }}>
           {error}
         </div>
       )}
-
-      {/* Stock List */}
       <ul className="list">
         {filteredStocks.length > 0 ? (
           filteredStocks.map((stock, index) => (
@@ -212,8 +192,6 @@ const WatchList = () => {
           </li>
         )}
       </ul>
-
-      {/* Doughnut Chart */}
       <DoughnutChart data={chartData} />
     </div>
   );

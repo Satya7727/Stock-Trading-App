@@ -19,6 +19,8 @@ const JWT_SECRET = process.env.JWT_SECRET || "yourSecretKey";
 const EODHD_API_KEY = process.env.EODHD_API_KEY;
 
 const app = express();
+app.set('trust proxy', 1);
+
 app.use(
   cors({
     origin: ["https://stock-trading-app-amber.vercel.app", "https://stock-trading-app-zeuq.vercel.app"],
@@ -59,20 +61,16 @@ app.get("/allOrders", verifyToken, async (req, res) => {
 app.post("/newOrder", verifyToken, async (req, res) => {
   try {
     const { name, qty, price, mode } = req.body;
-
     const user = await UserModel.findById(req.userId);
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
-
     const orderCost = qty * price;
     if (user.balance < orderCost) {
       return res.status(400).json({ message: "Insufficient balance" });
     }
-
     user.balance -= orderCost;
     await user.save();
-
     let newOrder = new OrdersModel({
       name,
       qty,
@@ -81,7 +79,6 @@ app.post("/newOrder", verifyToken, async (req, res) => {
       userId: req.userId,
     });
     await newOrder.save();
-
     let holding = await HoldingsModel.findOne({ userId: req.userId, name: name });
     if (holding) {
       holding.qty += qty;
@@ -98,7 +95,6 @@ app.post("/newOrder", verifyToken, async (req, res) => {
       });
       await holding.save();
     }
-
     res.json({ message: "Order saved successfully", newBalance: user.balance });
   } catch (err) {
     console.error("Error saving order:", err.message);
@@ -118,8 +114,6 @@ app.get("/getBalance", verifyToken, async (req, res) => {
   }
 });
 
-
-
 app.post("/signup", async (req, res) => {
   try {
     const { fullName, email, password } = req.body;
@@ -131,7 +125,7 @@ app.post("/signup", async (req, res) => {
     const newUser = new UserModel({ fullName, email, password: hashedPassword });
     await newUser.save();
     const token = jwt.sign({ userId: newUser._id, fullName: newUser.fullName }, JWT_SECRET, { expiresIn: "1h" });
-    res.cookie("token", token, { httpOnly: true, secure: false, maxAge: 60 * 60 * 1000 * 24 * 3 });
+    res.cookie("token", token, { httpOnly: true, secure: true, sameSite: "none", maxAge: 60 * 60 * 1000 * 24 * 3 });
     res.status(201).json({ 
       message: "User created successfully", 
       redirectUrl: "https://stock-trading-app-zeuq.vercel.app/"
@@ -154,7 +148,7 @@ app.post("/login", async (req, res) => {
       return res.status(400).json({ message: "Invalid email or password" });
     }
     const token = jwt.sign({ userId: user._id, fullName: user.fullName }, JWT_SECRET, { expiresIn: "1h" });
-    res.cookie("token", token, { httpOnly: true, secure: false, maxAge: 60 * 60 * 1000 * 24 * 3 });
+    res.cookie("token", token, { httpOnly: true, secure: true, sameSite: "none", maxAge: 60 * 60 * 1000 * 24 * 3 });
     res.status(200).json({ 
       message: "Login successful", 
       redirectUrl: "https://stock-trading-app-zeuq.vercel.app/"
@@ -165,10 +159,9 @@ app.post("/login", async (req, res) => {
   }
 });
 
-
 app.post("/logout", (req, res) => {
   try {
-    res.clearCookie("token", { httpOnly: true, secure: false });
+    res.clearCookie("token", { httpOnly: true, secure: true, sameSite: "none" });
     return res.status(200).json({ message: "Logout successful" });
   } catch (err) {
     console.error("Logout error:", err);
