@@ -25,41 +25,32 @@ const fallbackStocks = [
 
 const WatchListActions = ({ uid }) => {
   const generalContext = useContext(GeneralContext);
+
   const handleAction = (type) => {
     if (generalContext?.openBuyWindow) {
       generalContext.openBuyWindow(uid, type);
     }
   };
-  const commonStyle = {
-    display: "inline-flex",
-    alignItems: "center",
-    justifyContent: "center",
-    height: "32px",
-    lineHeight: "32px",
-    minWidth: "60px",
-    marginRight: "6px",
-    cursor: "pointer",
-    verticalAlign: "middle",
-  };
+
   return (
     <span className="actions">
       <Tooltip title="Buy (B)" placement="top" arrow TransitionComponent={Grow}>
-        <button className="buy" style={commonStyle} onClick={() => handleAction("BUY")}>
+        <button className="buy" onClick={() => handleAction("BUY")}>
           Buy
         </button>
       </Tooltip>
       <Tooltip title="Sell (S)" placement="top" arrow TransitionComponent={Grow}>
-        <button className="sell" style={commonStyle} onClick={() => handleAction("SELL")}>
+        <button className="sell" onClick={() => handleAction("SELL")}>
           Sell
         </button>
       </Tooltip>
       <Tooltip title="Analytics (A)" placement="top" arrow TransitionComponent={Grow}>
-        <button className="action" style={commonStyle}>
+        <button className="action">
           <BarChartOutlined />
         </button>
       </Tooltip>
       <Tooltip title="More" placement="top" arrow TransitionComponent={Grow}>
-        <button className="action" style={commonStyle}>
+        <button className="action">
           <MoreHoriz />
         </button>
       </Tooltip>
@@ -69,6 +60,7 @@ const WatchListActions = ({ uid }) => {
 
 const WatchListItem = ({ stock }) => {
   const [showActions, setShowActions] = useState(false);
+
   return (
     <li
       onMouseEnter={() => setShowActions(true)}
@@ -96,6 +88,7 @@ const WatchList = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
   useEffect(() => {
     const fetchWatchlist = async () => {
       try {
