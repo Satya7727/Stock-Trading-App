@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 
-const BACKEND_URL = "https://stock-trading-app-scxb.vercel.app";
+const BACKEND_URL = "https://stock-trading-app-ton3.onrender.com";
 
 const Summary = () => {
   const [user, setUser] = useState({ fullName: "User" });
